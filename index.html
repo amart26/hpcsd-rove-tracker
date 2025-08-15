@@ -17,7 +17,7 @@
     >
       <!-- Name Field -->
       <section class="name-input">
-        <label for="staffName">Your Name:</label>
+        <label id="id-name-input" for="staffName">Your Name:</label>
         <input
           type="text"
           id="staffName"
@@ -27,44 +27,68 @@
         />
       </section>
 
+      <section class="gender-input">
+        <label>Bathroom Type:</label><br />
+        <label>
+          <input type="radio" name="Gender" value="Girls" required />
+          Girls
+        </label>
+        <label>
+          <input type="radio" name="Gender" value="Boys" required />
+          Boys
+        </label>
+      </section>
+
       <!-- Location Buttons (each one submits the form) -->
       <main>
-        <button type="submit" name="Location" value="1st Floor Maint T">
-          1st Floor Maint T
+        <button type="submit" name="Location" value="1st Floor Maint T BR">
+          1st Floor Maint T BR
         </button>
-        <button type="submit" name="Location" value="1st Floor Elv T">
-          1st Floor Elv T
+        <button type="submit" name="Location" value="1st Floor Elv T BR">
+          1st Floor Elv T BR
         </button>
-        <button type="submit" name="Location" value="300 POD Bathroom">
-          300 POD Bathroom
+        <button type="submit" name="Location" value="300 POD BR">
+          300 POD BR
         </button>
-        <button type="submit" name="Location" value="500 POD Bathroom">
-          500 POD Bathroom
+        <button type="submit" name="Location" value="500 POD BR">
+          500 POD BR
         </button>
-        <button type="submit" name="Location" value="2nd Floor Maint T">
-          2nd Floor Maint T
+        <button type="submit" name="Location" value="2nd Floor Maint T BR">
+          2nd Floor Maint T BR
         </button>
-        <button type="submit" name="Location" value="2nd Floor Elv T">
-          2nd Floor Elv T
+        <button type="submit" name="Location" value="2nd Floor Elv T BR">
+          2nd Floor Elv T BR
         </button>
-        <button type="submit" name="Location" value="400 POD Bathroom">
-          400 POD Bathroom
+        <button type="submit" name="Location" value="400 POD  BR">
+          400 POD BR
         </button>
-        <button type="submit" name="Location" value="600 POD Bathroom">
-          600 POD Bathroom
+        <button type="submit" name="Location" value="600 POD BR">
+          600 POD BR
         </button>
       </main>
     </form>
+
     <script>
       (function () {
-        // 1) Set your deployed Apps Script Web App URL here:
         const WEB_APP_URL =
           "https://script.google.com/macros/s/AKfycbyfgyRcACCIHC_qGMT_5vc8m0iwT40pA2Ik25i5DAuQ5BAZKsyM6u_klJ_PU1xO2HoG/exec";
 
         const form = document.getElementById("bathroom-tracker");
         const nameInput = document.getElementById("staffName");
 
-        // Optional: tiny inline toast
+        // Prefill saved name from localStorage
+        nameInput.value = localStorage.getItem("user-name") || "";
+
+        // Prefill saved gender from localStorage
+        const savedGender = localStorage.getItem("user-gender");
+        if (savedGender) {
+          const genderRadio = document.querySelector(
+            `input[name="Gender"][value="${savedGender}"]`
+          );
+          if (genderRadio) genderRadio.checked = true;
+        }
+
+        // Tiny inline toast
         const toast = document.createElement("div");
         toast.style.position = "fixed";
         toast.style.bottom = "16px";
@@ -84,19 +108,27 @@
           setTimeout(() => (toast.style.opacity = "0"), 1000);
         }
 
-        // 2) Intercept submit; add the clicked button's value as Location
+        // Intercept submit
         form.addEventListener("submit", function (e) {
           e.preventDefault();
 
-          // Which button was clicked
-          const submitter = e.submitter; // modern browsers
+          const submitter = e.submitter;
           const locationValue =
             submitter && submitter.name === "Location" ? submitter.value : "";
 
           const nameValue = (nameInput.value || "").trim();
+          const genderRadio = document.querySelector(
+            'input[name="Gender"]:checked'
+          );
+          const genderValue = genderRadio ? genderRadio.value : "";
+
           if (!nameValue) {
             nameInput.focus();
             showToast("Enter name first");
+            return;
+          }
+          if (!genderValue) {
+            showToast("Select Girls or Boys");
             return;
           }
           if (!locationValue) {
@@ -104,24 +136,32 @@
             return;
           }
 
-          // Build URL-encoded body (simple request → no preflight)
+          // Build URL-encoded body
           const params = new URLSearchParams();
           params.append("Name", nameValue);
           params.append("Location", locationValue);
+          params.append("Gender", genderValue);
 
-          // 3) Fire-and-forget POST (no-cors to avoid CORS blocking on GitHub Pages)
           fetch(WEB_APP_URL, {
             method: "POST",
             mode: "no-cors",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: params.toString(),
-          }).catch(() => {
-            /* ignore network errors on client */
-          });
+          }).catch(() => {});
 
-          // 4) Instant UX: reset, refocus, tiny confirmation
+          // Save name & gender for next time
+          localStorage.setItem("user-name", nameValue);
+          localStorage.setItem("user-gender", genderValue);
+
+          // Reset radios/other fields, keep name & gender prefilled
           form.reset();
-          if (nameInput) nameInput.focus();
+          nameInput.value = nameValue;
+          const restoreGender = document.querySelector(
+            `input[name="Gender"][value="${genderValue}"]`
+          );
+          if (restoreGender) restoreGender.checked = true;
+
+          nameInput.focus();
           showToast("Recorded");
         });
       })();

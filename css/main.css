@@ -154,7 +154,12 @@ button::after {
 button:hover::after {
   opacity: 0.6;
 }
-
+.gender-input {
+  display: flex;
+  justify-content: center; /* center horizontally */
+  gap: 20px; /* space between Girls & Boys */
+  margin: 20px 0;
+}
 /* Responsive two-column layout for larger screens */
 @media (min-width: 600px) {
   main {
