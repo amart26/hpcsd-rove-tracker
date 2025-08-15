@@ -56,25 +56,73 @@
       </main>
     </form>
     <script>
-      // Optional UX: if redirected with ?ok=1, clear query and reset the form so you can submit again instantly
       (function () {
-        const params = new URLSearchParams(location.search);
-        if (params.get("ok") === "1") {
-          // reset form fields (keeps focus ready for next submission)
-          const form = document.getElementById("bathroom-tracker");
-          if (form) form.reset();
+        // 1) Set your deployed Apps Script Web App URL here:
+        const WEB_APP_URL = "https://script.google.com/macros/s/____/exec";
 
-          // remove query params so reload doesn’t reshow the toast or add more history noise
-          if (history.replaceState) {
-            history.replaceState(null, "", location.pathname);
+        const form = document.getElementById("bathroom-tracker");
+        const nameInput = document.getElementById("staffName");
+
+        // Optional: tiny inline toast
+        const toast = document.createElement("div");
+        toast.style.position = "fixed";
+        toast.style.bottom = "16px";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+        toast.style.padding = "8px 12px";
+        toast.style.borderRadius = "10px";
+        toast.style.fontSize = "0.9rem";
+        toast.style.background = "rgba(0,0,0,0.7)";
+        toast.style.color = "#fff";
+        toast.style.opacity = "0";
+        toast.style.transition = "opacity 180ms ease";
+        document.body.appendChild(toast);
+        function showToast(msg) {
+          toast.textContent = msg;
+          toast.style.opacity = "1";
+          setTimeout(() => (toast.style.opacity = "0"), 1000);
+        }
+
+        // 2) Intercept submit; add the clicked button's value as Location
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          // Which button was clicked
+          const submitter = e.submitter; // modern browsers
+          const locationValue =
+            submitter && submitter.name === "Location" ? submitter.value : "";
+
+          const nameValue = (nameInput.value || "").trim();
+          if (!nameValue) {
+            nameInput.focus();
+            showToast("Enter name first");
+            return;
+          }
+          if (!locationValue) {
+            showToast("Pick a location");
+            return;
           }
 
-          // (optional) show a tiny confirmation for staff
-          // alert("Recorded. You're good to submit the next location.");
-        }
-        // Focus the name field for rapid repeat submissions
-        const name = document.getElementById("staffName");
-        if (name) name.focus();
+          // Build URL-encoded body (simple request → no preflight)
+          const params = new URLSearchParams();
+          params.append("Name", nameValue);
+          params.append("Location", locationValue);
+
+          // 3) Fire-and-forget POST (no-cors to avoid CORS blocking on GitHub Pages)
+          fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: params.toString(),
+          }).catch(() => {
+            /* ignore network errors on client */
+          });
+
+          // 4) Instant UX: reset, refocus, tiny confirmation
+          form.reset();
+          if (nameInput) nameInput.focus();
+          showToast("Recorded");
+        });
       })();
     </script>
   </body>
