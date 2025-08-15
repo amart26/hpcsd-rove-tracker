@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Security Bathroom Tracker</title>
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
+  <body>
+    <header>Security Bathroom Tracker</header>
+
+    <form
+      class="panel"
+      id="bathroom-tracker"
+      action="https://script.google.com/macros/s/AKfycbyfgyRcACCIHC_qGMT_5vc8m0iwT40pA2Ik25i5DAuQ5BAZKsyM6u_klJ_PU1xO2HoG/exec"
+      method="POST"
+    >
+      <!-- Name Field -->
+      <section class="name-input">
+        <label for="staffName">Your Name:</label>
+        <input
+          type="text"
+          id="staffName"
+          name="Name"
+          placeholder="Enter your name"
+          required
+        />
+      </section>
+
+      <!-- Location Buttons (each one submits the form) -->
+      <main>
+        <button type="submit" name="Location" value="1st Floor Maint T">
+          1st Floor Maint T
+        </button>
+        <button type="submit" name="Location" value="1st Floor Elv T">
+          1st Floor Elv T
+        </button>
+        <button type="submit" name="Location" value="300 POD Bathroom">
+          300 POD Bathroom
+        </button>
+        <button type="submit" name="Location" value="500 POD Bathroom">
+          500 POD Bathroom
+        </button>
+        <button type="submit" name="Location" value="2nd Floor Maint T">
+          2nd Floor Maint T
+        </button>
+        <button type="submit" name="Location" value="2nd Floor Elv T">
+          2nd Floor Elv T
+        </button>
+        <button type="submit" name="Location" value="400 POD Bathroom">
+          400 POD Bathroom
+        </button>
+        <button type="submit" name="Location" value="600 POD Bathroom">
+          600 POD Bathroom
+        </button>
+      </main>
+    </form>
+  </body>
+</html>
