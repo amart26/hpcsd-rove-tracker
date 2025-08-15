@@ -55,5 +55,27 @@
         </button>
       </main>
     </form>
+    <script>
+      // Optional UX: if redirected with ?ok=1, clear query and reset the form so you can submit again instantly
+      (function () {
+        const params = new URLSearchParams(location.search);
+        if (params.get("ok") === "1") {
+          // reset form fields (keeps focus ready for next submission)
+          const form = document.getElementById("bathroom-tracker");
+          if (form) form.reset();
+
+          // remove query params so reload doesn’t reshow the toast or add more history noise
+          if (history.replaceState) {
+            history.replaceState(null, "", location.pathname);
+          }
+
+          // (optional) show a tiny confirmation for staff
+          // alert("Recorded. You're good to submit the next location.");
+        }
+        // Focus the name field for rapid repeat submissions
+        const name = document.getElementById("staffName");
+        if (name) name.focus();
+      })();
+    </script>
   </body>
 </html>
